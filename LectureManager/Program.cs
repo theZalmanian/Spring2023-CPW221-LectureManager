@@ -1,4 +1,5 @@
 using LectureManager.Data;
+using LectureManager.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,7 @@ namespace LectureManager
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
+                .AddRoles<IdentityRole>() // Add support for Identity Roles
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
 
@@ -27,7 +29,7 @@ namespace LectureManager
                 options.Password.RequireLowercase = true;
                 options.Password.RequireNonAlphanumeric = true;
                 options.Password.RequireUppercase = true;
-                options.Password.RequiredLength = 12; // modified min pass length from 6 to 12
+                options.Password.RequiredLength = 12; // Modified min pass length from 6 to 12
                 options.Password.RequiredUniqueChars = 1;
 
                 // Default Lockout settings.
@@ -66,6 +68,14 @@ namespace LectureManager
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
             app.MapRazorPages();
+
+            // Setup service provider
+            IServiceScope serviceProvider = app.Services.GetRequiredService<IServiceProvider>().CreateScope();
+
+            // Create the default site roles
+            IdentityHelper.CreateRoles(serviceProvider.ServiceProvider, IdentityHelper.Instructor, IdentityHelper.Student);
+
+            // Create default Instructor
 
             app.Run();
         }
