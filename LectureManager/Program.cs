@@ -11,6 +11,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+// Setup SendGrid
+builder.Services.AddTransient<IEmailProvider, EmailProviderSendGrid>();
+
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole>() // Add support for Identity Roles
     .AddEntityFrameworkStores<ApplicationDbContext>();
